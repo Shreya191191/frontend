@@ -51,7 +51,10 @@ class AuthViewModel @Inject constructor(
             signUpUseCase(username, email, password).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> _uiState.update { it.copy(isLoading = true, error = null, signupSuccessMessage = null) }
-                    is Resource.Success -> _uiState.update { it.copy(isLoading = false, signupSuccessMessage = resource.data, error = null) }
+                    is Resource.Success -> {
+                        _uiState.update { it.copy(signupSuccessMessage = "Account created successfully! Logging you in...") }
+                        signIn(email, password)
+                    }
                     is Resource.Error -> _uiState.update { it.copy(isLoading = false, error = resource.message) }
                 }
             }
@@ -75,7 +78,10 @@ class AuthViewModel @Inject constructor(
             vendorSignUpUseCase(username, email, password).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> _uiState.update { it.copy(isLoading = true, error = null, signupSuccessMessage = null) }
-                    is Resource.Success -> _uiState.update { it.copy(isLoading = false, signupSuccessMessage = resource.data, error = null) }
+                    is Resource.Success -> {
+                        _uiState.update { it.copy(signupSuccessMessage = "Vendor account created successfully! Logging you in...") }
+                        vendorSignIn(email, password)
+                    }
                     is Resource.Error -> _uiState.update { it.copy(isLoading = false, error = resource.message) }
                 }
             }

@@ -40,8 +40,8 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun FrontEndTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Disable dynamic color by default for a consistent premium brand design
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

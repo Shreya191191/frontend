@@ -31,6 +31,11 @@ class AuthRepositoryImpl @Inject constructor(
                 val userResponse = response.body()!!
                 val user = userResponse.toDomain()
                 
+                if (!user.isUser && !user.isAdmin) {
+                    emit(Resource.Error("Access Denied: Only customer or admin accounts can sign in here"))
+                    return@flow
+                }
+                
                 // Save tokens and session
                 val accessToken = userResponse.accessToken ?: ""
                 val refreshToken = userResponse.refreshToken ?: ""
@@ -92,6 +97,15 @@ class AuthRepositoryImpl @Inject constructor(
                 val userResponse = response.body()!!
                 val user = userResponse.toDomain()
 
+                if (isVendor && !user.isVendor) {
+                    emit(Resource.Error("Access Denied: Only vendor accounts can sign in here"))
+                    return@flow
+                }
+                if (!isVendor && !user.isUser && !user.isAdmin) {
+                    emit(Resource.Error("Access Denied: Only customer or admin accounts can sign in here"))
+                    return@flow
+                }
+
                 // Extract access token from response or Set-Cookie headers
                 val setCookies = response.headers().values("Set-Cookie")
                 var extractedAccessToken = userResponse.accessToken
@@ -138,6 +152,11 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val userResponse = response.body()!!
                 val user = userResponse.toDomain()
+                
+                if (!user.isVendor) {
+                    emit(Resource.Error("Access Denied: Only vendor accounts can sign in here"))
+                    return@flow
+                }
                 
                 // Save tokens and session
                 val accessToken = userResponse.accessToken ?: ""

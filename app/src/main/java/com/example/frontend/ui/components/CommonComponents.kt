@@ -2,15 +2,15 @@ package com.example.frontend.ui.components
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -26,9 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -159,24 +161,65 @@ fun RentARideButton(
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "button_press_scale"
+    )
+
+    val buttonBrush = if (enabled && !isLoading) {
+        Brush.horizontalGradient(
+            colors = listOf(
+                containerColor,
+                Color(
+                    red = (containerColor.red * 0.85f).coerceAtLeast(0f),
+                    green = (containerColor.green * 0.85f).coerceAtLeast(0f),
+                    blue = (containerColor.blue * 0.85f).coerceAtLeast(0f)
+                )
+            )
+        )
+    } else {
+        Brush.horizontalGradient(
+            colors = listOf(containerColor.copy(alpha = 0.5f), containerColor.copy(alpha = 0.5f))
+        )
+    }
+
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(56.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(18.dp))
+            .background(buttonBrush),
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
+            containerColor = Color.Transparent,
             contentColor = contentColor,
-            disabledContainerColor = containerColor.copy(alpha = 0.5f)
-        )
+            disabledContainerColor = Color.Transparent
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 1.dp,
+            focusedElevation = 4.dp
+        ),
+        contentPadding = PaddingValues(0.dp),
+        interactionSource = interactionSource
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 color = contentColor,
                 modifier = Modifier.size(24.dp),
-                strokeWidth = 2.dp
+                strokeWidth = 2.5.dp
             )
         } else {
             Text(
@@ -203,8 +246,27 @@ fun RentARideTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    accentColor: Color = MaterialTheme.colorScheme.primary
 ) {
+    var isFocused by remember { mutableStateOf(false) }
+    
+    val textElevation by animateFloatAsState(
+        targetValue = if (isFocused) 3f else 0f,
+        animationSpec = tween(150),
+        label = "text_field_elevation"
+    )
+
+    val containerBgColor by animateColorAsState(
+        targetValue = if (isSystemInDarkTheme()) {
+            if (isFocused) accentColor.copy(alpha = 0.05f) else Color(0xFF161616)
+        } else {
+            if (isFocused) accentColor.copy(alpha = 0.03f) else Color(0xFFF5F5F5)
+        },
+        animationSpec = tween(150),
+        label = "textfield_bg"
+    )
+
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
@@ -219,12 +281,27 @@ fun RentARideTextField(
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
             singleLine = singleLine,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { isFocused = it.isFocused }
+                .graphicsLayer {
+                    shadowElevation = textElevation
+                    shape = RoundedCornerShape(18.dp)
+                    clip = true
+                },
+            shape = RoundedCornerShape(18.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = SlateGrey.copy(alpha = 0.5f),
-                errorBorderColor = MaterialTheme.colorScheme.error
+                focusedBorderColor = accentColor,
+                unfocusedBorderColor = SlateGrey.copy(alpha = 0.22f),
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                focusedLabelColor = accentColor,
+                unfocusedLabelColor = SlateGrey,
+                focusedLeadingIconColor = accentColor,
+                unfocusedLeadingIconColor = SlateGrey,
+                cursorColor = accentColor,
+                focusedContainerColor = containerBgColor,
+                unfocusedContainerColor = containerBgColor,
+                errorContainerColor = containerBgColor
             )
         )
         if (errorText != null) {
@@ -232,9 +309,117 @@ fun RentARideTextField(
                 text = errorText,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                modifier = Modifier.padding(start = 12.dp, top = 4.dp)
             )
         }
+    }
+}
+
+// 5a. Google Sign-In Button
+@Composable
+fun GoogleSignInButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    text: String = "Continue with Google",
+    enabled: Boolean = true
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.97f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "google_button_press"
+    )
+
+    val isDark = isSystemInDarkTheme()
+    val containerColor = if (isDark) Color(0xFF131314) else Color.White
+    val contentColor = if (isDark) Color(0xFFE3E3E3) else Color(0xFF1F1F1F)
+    val borderColor = if (isDark) Color(0xFF8E918F) else Color(0xFF747775)
+
+    Surface(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
+        enabled = enabled,
+        shape = RoundedCornerShape(18.dp),
+        color = containerColor,
+        contentColor = contentColor,
+        border = BorderStroke(1.dp, borderColor),
+        shadowElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = androidx.compose.ui.res.painterResource(id = com.example.frontend.R.drawable.ic_google_logo),
+                contentDescription = "Google Logo",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp
+                )
+            )
+        }
+    }
+}
+
+// 5b. Premium Loading Indicator
+@Composable
+fun PremiumLoadingIndicator(
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val transition = rememberInfiniteTransition(label = "loading_anim")
+    val rotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "loading_rotation"
+    )
+    val scale by transition.animateFloat(
+        initialValue = 0.85f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "loading_scale"
+    )
+
+    Box(
+        modifier = modifier
+            .size(54.dp)
+            .graphicsLayer {
+                rotationZ = rotation
+                scaleX = scale
+                scaleY = scale
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            color = accentColor,
+            trackColor = accentColor.copy(alpha = 0.1f),
+            strokeWidth = 3.5.dp,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 
