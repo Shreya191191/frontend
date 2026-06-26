@@ -36,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.frontend.ui.navigation.Screen
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.frontend.R
@@ -209,8 +210,7 @@ fun VehicleDetailsScreen(
                                     durationDays = durationDays,
                                     totalPrice = totalPrice,
                                     onBookClick = {
-                                        // Booking navigation
-                                        Toast.makeText(context, "Redirecting to booking...", Toast.LENGTH_SHORT).show()
+                                        navController.navigate(Screen.Checkout.route)
                                     }
                                 )
                             }
@@ -258,7 +258,7 @@ fun VehicleDetailsScreen(
                                     durationDays = durationDays,
                                     totalPrice = totalPrice,
                                     onBookClick = {
-                                        Toast.makeText(context, "Redirecting to booking...", Toast.LENGTH_SHORT).show()
+                                        navController.navigate(Screen.Checkout.route)
                                     }
                                 )
                             }
