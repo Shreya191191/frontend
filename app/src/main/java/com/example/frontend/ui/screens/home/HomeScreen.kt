@@ -45,28 +45,11 @@ import java.util.*
 @Composable
 fun HomeScreen(
     navController: NavController,
+    viewModel: com.example.frontend.ui.screens.search.SearchFlowViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-
-    // Search state parameters
-    var selectedDistrict by remember { mutableStateOf("Colombo") }
-    var selectedPickUpLocation by remember { mutableStateOf("Colombo Airport (CMB)") }
-    var selectedDropOffLocation by remember { mutableStateOf("Colombo Airport (CMB)") }
-    
-    var pickUpDate by remember { mutableStateOf<Calendar?>(null) }
-    var dropOffDate by remember { mutableStateOf<Calendar?>(null) }
-    var pickUpTime by remember { mutableStateOf<Calendar?>(null) }
-    var dropOffTime by remember { mutableStateOf<Calendar?>(null) }
-
-    // Mock drop-down choices
-    val districts = listOf("Colombo", "Kandy", "Galle", "Negombo")
-    val locations = mapOf(
-        "Colombo" to listOf("Colombo Airport (CMB)", "Colombo Downtown", "Galle Face Green"),
-        "Kandy" to listOf("Kandy Central Station", "Kandy Lake View"),
-        "Galle" to listOf("Galle Fort Gate", "Galle Coastal Rd"),
-        "Negombo" to listOf("Negombo Beach Resort", "Negombo Central")
-    )
+    val uiState by viewModel.uiState.collectAsState()
 
     // District and Location Dropdown control
     var showDistrictMenu by remember { mutableStateOf(false) }
@@ -181,7 +164,11 @@ fun HomeScreen(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column(horizontalAlignment = Alignment.Start) {
                                         Text("Select District", style = MaterialTheme.typography.labelSmall, color = SlateGrey)
-                                        Text(selectedDistrict, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold), color = MaterialTheme.colorScheme.onSurface)
+                                        Text(
+                                            text = uiState.selectedDistrict.ifEmpty { "Select District" },
+                                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
                                     }
                                 }
                                 Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = SlateGrey)
@@ -192,16 +179,21 @@ fun HomeScreen(
                             onDismissRequest = { showDistrictMenu = false },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {
-                            districts.forEach { dist ->
+                            if (uiState.isLoadingLocations) {
                                 DropdownMenuItem(
-                                    text = { Text(dist) },
-                                    onClick = {
-                                        selectedDistrict = dist
-                                        selectedPickUpLocation = locations[dist]?.first() ?: ""
-                                        selectedDropOffLocation = locations[dist]?.first() ?: ""
-                                        showDistrictMenu = false
-                                    }
+                                    text = { Text("Loading districts...") },
+                                    onClick = {}
                                 )
+                            } else {
+                                uiState.districts.forEach { dist ->
+                                    DropdownMenuItem(
+                                        text = { Text(dist) },
+                                        onClick = {
+                                            viewModel.setDistrict(dist)
+                                            showDistrictMenu = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -224,7 +216,13 @@ fun HomeScreen(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column(horizontalAlignment = Alignment.Start) {
                                         Text("Pick-up Location", style = MaterialTheme.typography.labelSmall, color = SlateGrey)
-                                        Text(selectedPickUpLocation, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(
+                                            text = uiState.pickupLocation.ifEmpty { "Select Pick-up Location" },
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
                                     }
                                 }
                                 Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = SlateGrey)
@@ -235,14 +233,22 @@ fun HomeScreen(
                             onDismissRequest = { showPickUpMenu = false },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {
-                            locations[selectedDistrict]?.forEach { loc ->
+                            val pickUpLocs = uiState.locationsMap[uiState.selectedDistrict] ?: emptyList()
+                            if (pickUpLocs.isEmpty()) {
                                 DropdownMenuItem(
-                                    text = { Text(loc) },
-                                    onClick = {
-                                        selectedPickUpLocation = loc
-                                        showPickUpMenu = false
-                                    }
+                                    text = { Text("No locations found") },
+                                    onClick = {}
                                 )
+                            } else {
+                                pickUpLocs.forEach { loc ->
+                                    DropdownMenuItem(
+                                        text = { Text(loc) },
+                                        onClick = {
+                                            viewModel.setPickupLocation(loc)
+                                            showPickUpMenu = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -265,7 +271,13 @@ fun HomeScreen(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column(horizontalAlignment = Alignment.Start) {
                                         Text("Drop-off Location", style = MaterialTheme.typography.labelSmall, color = SlateGrey)
-                                        Text(selectedDropOffLocation, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(
+                                            text = uiState.dropoffLocation.ifEmpty { "Select Drop-off Location" },
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
                                     }
                                 }
                                 Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = SlateGrey)
@@ -276,14 +288,22 @@ fun HomeScreen(
                             onDismissRequest = { showDropOffMenu = false },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {
-                            locations[selectedDistrict]?.forEach { loc ->
+                            val dropOffLocs = uiState.locationsMap[uiState.selectedDistrict] ?: emptyList()
+                            if (dropOffLocs.isEmpty()) {
                                 DropdownMenuItem(
-                                    text = { Text(loc) },
-                                    onClick = {
-                                        selectedDropOffLocation = loc
-                                        showDropOffMenu = false
-                                    }
+                                    text = { Text("No locations found") },
+                                    onClick = {}
                                 )
+                            } else {
+                                dropOffLocs.forEach { loc ->
+                                    DropdownMenuItem(
+                                        text = { Text(loc) },
+                                        onClick = {
+                                            viewModel.setDropoffLocation(loc)
+                                            showDropOffMenu = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -296,18 +316,26 @@ fun HomeScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             RentARideDatePicker(
                                 label = "Pick-up Date",
-                                selectedDate = pickUpDate,
-                                onDateSelected = { pickUpDate = it }
+                                selectedDate = uiState.pickupDateTime,
+                                onDateSelected = { newDate ->
+                                    val updated = (uiState.pickupDateTime ?: Calendar.getInstance()).apply {
+                                        set(Calendar.YEAR, newDate.get(Calendar.YEAR))
+                                        set(Calendar.MONTH, newDate.get(Calendar.MONTH))
+                                        set(Calendar.DAY_OF_MONTH, newDate.get(Calendar.DAY_OF_MONTH))
+                                    }
+                                    viewModel.setPickupDateTime(updated)
+                                }
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             RentARideTimePicker(
                                 label = "Pick-up Time",
-                                selectedTime = pickUpTime,
+                                selectedTime = uiState.pickupDateTime,
                                 onTimeSelected = { h, m ->
-                                    pickUpTime = Calendar.getInstance().apply {
+                                    val updated = (uiState.pickupDateTime ?: Calendar.getInstance()).apply {
                                         set(Calendar.HOUR_OF_DAY, h)
                                         set(Calendar.MINUTE, m)
                                     }
+                                    viewModel.setPickupDateTime(updated)
                                 }
                             )
                         }
@@ -315,37 +343,57 @@ fun HomeScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             RentARideDatePicker(
                                 label = "Drop-off Date",
-                                selectedDate = dropOffDate,
-                                onDateSelected = { dropOffDate = it },
-                                minDate = pickUpDate ?: Calendar.getInstance()
+                                selectedDate = uiState.dropoffDateTime,
+                                onDateSelected = { newDate ->
+                                    val updated = (uiState.dropoffDateTime ?: Calendar.getInstance()).apply {
+                                        set(Calendar.YEAR, newDate.get(Calendar.YEAR))
+                                        set(Calendar.MONTH, newDate.get(Calendar.MONTH))
+                                        set(Calendar.DAY_OF_MONTH, newDate.get(Calendar.DAY_OF_MONTH))
+                                    }
+                                    viewModel.setDropoffDateTime(updated)
+                                },
+                                minDate = uiState.pickupDateTime ?: Calendar.getInstance()
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             RentARideTimePicker(
                                 label = "Drop-off Time",
-                                selectedTime = dropOffTime,
+                                selectedTime = uiState.dropoffDateTime,
                                 onTimeSelected = { h, m ->
-                                    dropOffTime = Calendar.getInstance().apply {
+                                    val updated = (uiState.dropoffDateTime ?: Calendar.getInstance()).apply {
                                         set(Calendar.HOUR_OF_DAY, h)
                                         set(Calendar.MINUTE, m)
                                     }
+                                    viewModel.setDropoffDateTime(updated)
                                 }
                             )
                         }
+                    }
+
+                    // Display validation error if present
+                    if (uiState.searchError != null) {
+                        Text(
+                            text = uiState.searchError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
 
                     // Search Button
                     RentARideButton(
                         text = "Search Available Cars",
                         onClick = {
-                            if (pickUpDate == null || dropOffDate == null) {
+                            if (uiState.pickupDateTime == null || uiState.dropoffDateTime == null) {
                                 Toast.makeText(context, "Please select pick-up and drop-off dates", Toast.LENGTH_SHORT).show()
                             } else {
-                                navController.navigate(Screen.SearchResults.route)
+                                viewModel.searchVehicles {
+                                    navController.navigate(Screen.SearchResults.route)
+                                }
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         containerColor = EmeraldPrimary,
-                        contentColor = Color.Black
+                        contentColor = Color.Black,
+                        isLoading = uiState.isSearching
                     )
                 }
             }
