@@ -22,13 +22,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.frontend.ui.components.MainLayoutScaffold
 import com.example.frontend.ui.screens.auth.*
 import com.example.frontend.ui.screens.search.*
 import com.example.frontend.ui.screens.home.HomeScreen
-import com.example.frontend.ui.screens.orders.OrdersScreen
+import com.example.frontend.ui.screens.orders.*
 import com.example.frontend.ui.screens.wishlist.WishlistScreen
 import com.example.frontend.ui.screens.profile.ProfileScreen
+import com.example.frontend.ui.screens.booking.CheckoutScreen
+import com.example.frontend.ui.screens.booking.BookingSuccessScreen
+import com.example.frontend.ui.screens.vendor.VendorDashboardScreen
+import com.example.frontend.ui.screens.admin.AdminDashboardScreen
 
 @Composable
 fun AppNavigation(
@@ -196,8 +201,10 @@ fun CustomerNavHost(
         }
 
         composable(Screen.Orders.route) {
+            val ordersViewModel: OrdersViewModel = hiltViewModel()
             OrdersScreen(
-                navController = navController
+                navController = navController,
+                viewModel = ordersViewModel
             )
         }
 
@@ -208,11 +215,8 @@ fun CustomerNavHost(
         }
 
         composable(Screen.Profile.route) {
-            val session = authViewModel.currentSession.collectAsState().value
             ProfileScreen(
                 navController = navController,
-                userName = session?.username ?: "Shreyas",
-                userEmail = session?.email ?: "shreyas@rentaride.com",
                 onSignOut = {
                     authViewModel.signOut()
                     navController.navigate(Screen.SignIn.route) {
@@ -248,22 +252,41 @@ fun CustomerNavHost(
             )
         }
 
+        composable(Screen.Checkout.route) {
+            CheckoutScreen(
+                navController = navController,
+                searchFlowViewModel = searchViewModel
+            )
+        }
+
+        composable(Screen.BookingSuccess.route) {
+            BookingSuccessScreen(
+                navController = navController
+            )
+        }
+
         composable(Screen.VendorDashboard.route) {
-            PlaceholderScreen(title = "Vendor Dashboard Screen", onSignOut = {
-                authViewModel.signOut()
-                navController.navigate(Screen.VendorSignIn.route) {
-                    popUpTo(0) { inclusive = true }
+            VendorDashboardScreen(
+                navController = navController,
+                onSignOut = {
+                    authViewModel.signOut()
+                    navController.navigate(Screen.VendorSignIn.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
-            })
+            )
         }
 
         composable(Screen.AdminDashboard.route) {
-            PlaceholderScreen(title = "Admin Dashboard Screen", onSignOut = {
-                authViewModel.signOut()
-                navController.navigate(Screen.SignIn.route) {
-                    popUpTo(0) { inclusive = true }
+            AdminDashboardScreen(
+                navController = navController,
+                onSignOut = {
+                    authViewModel.signOut()
+                    navController.navigate(Screen.SignIn.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
-            })
+            )
         }
     }
 }
