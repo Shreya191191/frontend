@@ -73,6 +73,23 @@ fun Modifier.shimmerLoading(): Modifier = composed {
     background(brush = brush)
 }
 
+// 1a. Bounce click scale modifier
+fun Modifier.bounceClick(interactionSource: MutableInteractionSource): Modifier = composed {
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "bounce_click_scale"
+    )
+    this.graphicsLayer {
+        scaleX = scale
+        scaleY = scale
+    }
+}
+
 // 2. Rating Bar
 @Composable
 fun RatingBar(
