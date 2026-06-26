@@ -29,6 +29,10 @@ fun VehicleDto.toDomain(): Vehicle {
         location = location ?: "",
         district = district ?: "",
         isBooked = isBooked ?: false,
-        isAdminApproved = isAdminApproved ?: false
+        isAdminApproved = isAdminApproved ?: false,
+        isRejected = isRejected ?: false,
+        insuranceEnd = insurance_end,
+        registrationEnd = registeration_end,
+        pollutionEnd = pollution_end
     )
 }
