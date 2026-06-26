@@ -17,5 +17,7 @@ interface AuthRepository {
     
     fun signOut(): Flow<Resource<Unit>>
     
+    fun editUserProfile(userId: String, username: String, email: String, phoneNumber: String, adress: String): Flow<Resource<User>>
+    
     fun getSessionDetails(): Flow<User?>
 }
