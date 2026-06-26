@@ -25,7 +25,11 @@ data class Vehicle(
     val location: String,
     val district: String,
     val isBooked: Boolean,
-    val isAdminApproved: Boolean
+    val isAdminApproved: Boolean,
+    val isRejected: Boolean = false,
+    val insuranceEnd: String? = null,
+    val registrationEnd: String? = null,
+    val pollutionEnd: String? = null
 )
 
 data class SearchFilters(
