@@ -16,3 +16,14 @@ data class GoogleAuthRequest(
     val email: String,
     val photo: String
 )
+
+data class EditProfileRequest(
+    val formData: EditProfileFormData
+)
+
+data class EditProfileFormData(
+    val username: String,
+    val email: String,
+    val phoneNumber: String,
+    val adress: String
+)
