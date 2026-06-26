@@ -45,7 +45,11 @@ data class VehicleDto(
     @SerializedName("isBooked")
     val isBooked: Boolean?,
     @SerializedName("isAdminApproved")
-    val isAdminApproved: Boolean?
+    val isAdminApproved: Boolean?,
+    val isRejected: Boolean? = null,
+    val insurance_end: String? = null,
+    val registeration_end: String? = null,
+    val pollution_end: String? = null
 )
 
 data class VariantsRequest(
