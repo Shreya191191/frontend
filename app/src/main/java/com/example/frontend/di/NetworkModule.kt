@@ -20,6 +20,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    // Using deployed Render backend
     private const val BASE_URL = "https://rideme-s2pk.onrender.com/"
 
     @Provides
