@@ -23,6 +23,8 @@ class SessionManager @Inject constructor(
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_EMAIL = stringPreferencesKey("user_email")
         private val USER_ROLE = stringPreferencesKey("user_role") // "user", "vendor", "admin"
+        private val USER_PHONE = stringPreferencesKey("user_phone")
+        private val USER_ADRESS = stringPreferencesKey("user_adress")
     }
 
     val accessTokenFlow: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -38,8 +40,10 @@ class SessionManager @Inject constructor(
         val name = preferences[USER_NAME]
         val email = preferences[USER_EMAIL]
         val role = preferences[USER_ROLE]
+        val phone = preferences[USER_PHONE]
+        val address = preferences[USER_ADRESS]
         if (id != null && name != null && email != null && role != null) {
-            UserSession(id, name, email, role)
+            UserSession(id, name, email, role, phone, address)
         } else {
             null
         }
@@ -51,7 +55,9 @@ class SessionManager @Inject constructor(
         userId: String,
         username: String,
         email: String,
-        role: String
+        role: String,
+        phoneNumber: String? = null,
+        adress: String? = null
     ) {
         context.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN] = accessToken
@@ -60,6 +66,8 @@ class SessionManager @Inject constructor(
             preferences[USER_NAME] = username
             preferences[USER_EMAIL] = email
             preferences[USER_ROLE] = role
+            if (phoneNumber != null) preferences[USER_PHONE] = phoneNumber else preferences.remove(USER_PHONE)
+            if (adress != null) preferences[USER_ADRESS] = adress else preferences.remove(USER_ADRESS)
         }
     }
 
@@ -67,6 +75,15 @@ class SessionManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN] = accessToken
             preferences[REFRESH_TOKEN] = refreshToken
+        }
+    }
+
+    suspend fun updateProfileDetails(username: String, email: String, phoneNumber: String?, adress: String?) {
+        context.dataStore.edit { preferences ->
+            preferences[USER_NAME] = username
+            preferences[USER_EMAIL] = email
+            if (phoneNumber != null) preferences[USER_PHONE] = phoneNumber else preferences.remove(USER_PHONE)
+            if (adress != null) preferences[USER_ADRESS] = adress else preferences.remove(USER_ADRESS)
         }
     }
 
@@ -81,5 +98,7 @@ data class UserSession(
     val userId: String,
     val username: String,
     val email: String,
-    val role: String
+    val role: String,
+    val phoneNumber: String? = null,
+    val adress: String? = null
 )
