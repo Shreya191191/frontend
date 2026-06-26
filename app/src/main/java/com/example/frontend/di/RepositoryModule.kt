@@ -2,8 +2,10 @@ package com.example.frontend.di
 
 import com.example.frontend.data.repository.AuthRepositoryImpl
 import com.example.frontend.data.repository.SearchRepositoryImpl
+import com.example.frontend.data.repository.BookingRepositoryImpl
 import com.example.frontend.domain.repository.AuthRepository
 import com.example.frontend.domain.repository.SearchRepository
+import com.example.frontend.domain.repository.BookingRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,5 +27,23 @@ abstract class RepositoryModule {
     abstract fun bindSearchRepository(
         searchRepositoryImpl: SearchRepositoryImpl
     ): SearchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBookingRepository(
+        bookingRepositoryImpl: BookingRepositoryImpl
+    ): BookingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVendorRepository(
+        vendorRepositoryImpl: com.example.frontend.data.repository.VendorRepositoryImpl
+    ): com.example.frontend.domain.repository.VendorRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAdminRepository(
+        adminRepositoryImpl: com.example.frontend.data.repository.AdminRepositoryImpl
+    ): com.example.frontend.domain.repository.AdminRepository
 }
 
