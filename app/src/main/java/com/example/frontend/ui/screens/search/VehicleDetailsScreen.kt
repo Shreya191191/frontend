@@ -102,9 +102,8 @@ fun VehicleDetailsScreen(
                     }) {
                         Icon(Icons.Default.Share, contentDescription = "Share")
                     }
-
-
                 },
+
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
