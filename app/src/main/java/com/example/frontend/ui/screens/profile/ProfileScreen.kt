@@ -46,6 +46,7 @@ fun ProfileScreen(
     val context = LocalContext.current
 
     var showEditDialog by remember { mutableStateOf(false) }
+    var showComingSoonDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -139,7 +140,7 @@ fun ProfileScreen(
             border = BorderStroke(1.dp, SlateGrey.copy(alpha = 0.12f))
         ) {
             Column {
-                ProfileItemRow(icon = Icons.Default.Lock, title = "Change Password", subtitle = "Secure your login credentials")
+                ProfileItemRow(icon = Icons.Default.Lock, title = "Change Password", subtitle = "Secure your login credentials", onClick = { showComingSoonDialog = true })
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
                 ProfileItemRow(icon = Icons.Default.Lock, title = "Privacy & Safety", subtitle = "Account security configuration")
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
