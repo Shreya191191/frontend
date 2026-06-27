@@ -142,7 +142,7 @@ fun ProfileScreen(
             Column {
                 ProfileItemRow(icon = Icons.Default.Lock, title = "Change Password", subtitle = "Secure your login credentials", onClick = { showComingSoonDialog = true })
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Lock, title = "Privacy & Safety", subtitle = "Account security configuration")
+                ProfileItemRow(icon = Icons.Default.Lock, title = "Privacy & Safety", subtitle = "Account security configuration", onClick = { showComingSoonDialog = true })
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
                 ProfileItemRow(icon = Icons.Default.Settings, title = "App Settings", subtitle = "Theme, units & notifications")
             }
