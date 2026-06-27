@@ -57,4 +57,6 @@ interface VendorRepository {
     fun deleteVehicle(vehicleId: String): Flow<Resource<String>>
 
     fun getVendorBookings(vehicleIds: List<String>): Flow<Resource<List<VendorBooking>>>
+
+    fun changeBookingStatus(bookingId: String, status: String): Flow<Resource<String>>
 }
