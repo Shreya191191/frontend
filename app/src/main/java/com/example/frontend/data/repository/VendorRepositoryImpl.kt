@@ -243,6 +243,23 @@ class VendorRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun changeBookingStatus(bookingId: String, status: String): Flow<Resource<String>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = vendorApi.changeBookingStatus(ChangeBookingStatusRequest(bookingId, status))
+            if (response.isSuccessful && response.body() != null) {
+                emit(Resource.Success(response.body()!!.message ?: "Booking status changed successfully"))
+            } else {
+                val errorMsg = parseError(response.errorBody()?.string())
+                emit(Resource.Error(errorMsg))
+            }
+        } catch (e: IOException) {
+            emit(Resource.Error("Network error. Please check your internet connection.", e))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "An error occurred", e))
+        }
+    }
+
     private fun parseError(errorJson: String?): String {
         if (errorJson.isNullOrEmpty()) return "An unknown error occurred"
         return try {
