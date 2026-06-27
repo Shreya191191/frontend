@@ -69,13 +69,5 @@ class VehicleDetailsViewModel @Inject constructor(
         }
     }
 
-    fun toggleFavorite(vehicleId: String) {
-        if (favoriteIds.contains(vehicleId)) {
-            favoriteIds.remove(vehicleId)
-            _uiState.update { it.copy(isFavorite = false) }
-        } else {
-            favoriteIds.add(vehicleId)
-            _uiState.update { it.copy(isFavorite = true) }
-        }
-    }
+
 }
