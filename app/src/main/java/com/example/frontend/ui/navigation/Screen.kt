@@ -8,7 +8,6 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Search : Screen("search")
     object Orders : Screen("orders")
-    object Wishlist : Screen("wishlist")
     object Profile : Screen("profile")
     object Settings : Screen("settings")
 
@@ -23,3 +22,4 @@ sealed class Screen(val route: String) {
     object VendorDashboard : Screen("vendor_dashboard")
     object AdminDashboard : Screen("admin_dashboard")
 }
+
