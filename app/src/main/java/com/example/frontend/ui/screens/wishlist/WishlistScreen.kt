@@ -26,7 +26,6 @@ import androidx.navigation.NavController
 import com.example.frontend.R
 import com.example.frontend.ui.components.RatingBar
 import com.example.frontend.ui.components.RentARideButton
-import com.example.frontend.ui.screens.home.MockVehicle
 import com.example.frontend.ui.theme.EmeraldPrimary
 import com.example.frontend.ui.theme.SlateGrey
 
@@ -37,10 +36,7 @@ fun WishlistScreen(
 ) {
     var wishlistItems by remember {
         mutableStateOf(
-            listOf(
-                MockVehicle("1", "Tesla Model S", "Luxury", "$120/day", R.drawable.a_b, 5, "Automatic", 4.9f, true),
-                MockVehicle("2", "Audi Q7 Super", "SUV", "$95/day", R.drawable.b_c, 7, "Automatic", 4.8f, true)
-            )
+            emptyList<MockVehicle>()
         )
     }
 
@@ -194,3 +190,16 @@ fun WishlistCard(
         }
     }
 }
+
+data class MockVehicle(
+    val id: String,
+    val name: String,
+    val type: String,
+    val price: String,
+    val imageRes: Int,
+    val seats: Int,
+    val transmission: String,
+    val rating: Float,
+    val isElectric: Boolean,
+    val distance: String? = null
+)
