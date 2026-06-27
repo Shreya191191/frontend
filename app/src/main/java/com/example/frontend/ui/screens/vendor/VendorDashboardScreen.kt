@@ -63,6 +63,7 @@ fun VendorDashboardScreen(
     val addState by viewModel.addState.collectAsState()
     val editState by viewModel.editState.collectAsState()
     val deleteState by viewModel.deleteState.collectAsState()
+    val changeStatusAction by viewModel.changeStatusState.collectAsState()
 
     var activeTab by remember { mutableStateOf(0) }
     var showAddDialog by remember { mutableStateOf(false) }
@@ -99,6 +100,16 @@ fun VendorDashboardScreen(
         } else if (deleteState is Resource.Error) {
             Toast.makeText(context, (deleteState as Resource.Error).message, Toast.LENGTH_LONG).show()
             viewModel.resetStates()
+        }
+    }
+
+    LaunchedEffect(changeStatusAction) {
+        if (changeStatusAction is Resource.Success && (changeStatusAction as Resource.Success<String>).data.isNotEmpty()) {
+            Toast.makeText(context, (changeStatusAction as Resource.Success<String>).data, Toast.LENGTH_SHORT).show()
+            viewModel.resetChangeStatusState()
+        } else if (changeStatusAction is Resource.Error) {
+            Toast.makeText(context, (changeStatusAction as Resource.Error).message, Toast.LENGTH_LONG).show()
+            viewModel.resetChangeStatusState()
         }
     }
 
@@ -178,6 +189,7 @@ fun VendorDashboardScreen(
                 1 -> BookingsTabContent(
                     state = bookingsState,
                     onDetails = { selectedBookingForDetails = it },
+                    onChangeStatus = { id, status -> viewModel.changeBookingStatus(id, status) },
                     onRetry = { viewModel.loadVendorData() }
                 )
             }
@@ -387,6 +399,7 @@ fun VehicleItemCard(
 fun BookingsTabContent(
     state: Resource<List<VendorBooking>>,
     onDetails: (VendorBooking) -> Unit,
+    onChangeStatus: (String, String) -> Unit,
     onRetry: () -> Unit
 ) {
     when (state) {
@@ -436,7 +449,11 @@ fun BookingsTabContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(bookings) { booking ->
-                        BookingItemCard(booking = booking, onDetails = { onDetails(booking) })
+                        BookingItemCard(
+                            booking = booking,
+                            onDetails = { onDetails(booking) },
+                            onChangeStatus = { status -> onChangeStatus(booking.id, status) }
+                        )
                     }
                 }
             }
@@ -447,10 +464,14 @@ fun BookingsTabContent(
 @Composable
 fun BookingItemCard(
     booking: VendorBooking,
-    onDetails: () -> Unit
+    onDetails: () -> Unit,
+    onChangeStatus: (String) -> Unit
 ) {
+    var statusExpanded by remember { mutableStateOf(false) }
+    val statuses = listOf("booked", "onTrip", "tripCompleted", "canceled", "overDue", "notPicked")
+
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onDetails() },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, SlateGrey.copy(alpha = 0.12f))
@@ -520,6 +541,55 @@ fun BookingItemCard(
                 Column(horizontalAlignment = Alignment.End) {
                     Text("DROP-OFF", style = MaterialTheme.typography.labelSmall, color = SlateGrey)
                     Text(booking.dropOffLocation, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(vertical = 12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text("Change Status", style = MaterialTheme.typography.labelSmall, color = SlateGrey)
+                    Box(modifier = Modifier.padding(top = 4.dp)) {
+                        Surface(
+                            modifier = Modifier.clickable { statusExpanded = true },
+                            shape = RoundedCornerShape(6.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(booking.status, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("▼", fontSize = 10.sp, color = EmeraldPrimary)
+                            }
+                        }
+
+                        DropdownMenu(
+                            expanded = statusExpanded,
+                            onDismissRequest = { statusExpanded = false }
+                        ) {
+                            statuses.forEach { st ->
+                                DropdownMenuItem(
+                                    text = { Text(st) },
+                                    onClick = {
+                                        statusExpanded = false
+                                        if (st != booking.status) {
+                                            onChangeStatus(st)
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                TextButton(onClick = onDetails) {
+                    Text("View Details", color = EmeraldPrimary, fontWeight = FontWeight.Bold)
                 }
             }
         }
