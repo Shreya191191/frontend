@@ -103,18 +103,7 @@ fun VehicleDetailsScreen(
                         Icon(Icons.Default.Share, contentDescription = "Share")
                     }
 
-                    // Favorite/Wishlist Button
-                    IconButton(onClick = {
-                        viewModel.toggleFavorite(vehicleId)
-                        val message = if (!uiState.isFavorite) "Added to Favorites" else "Removed from Favorites"
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    }) {
-                        Icon(
-                            imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite",
-                            tint = if (uiState.isFavorite) EmeraldPrimary else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
