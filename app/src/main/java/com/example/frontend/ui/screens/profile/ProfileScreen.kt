@@ -121,7 +121,7 @@ fun ProfileScreen(
                     onClick = { showEditDialog = true }
                 )
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Email, title = "Email Address", subtitle = userEmail)
+                ProfileItemRow(icon = Icons.Default.Email, title = "Email Address", subtitle = userEmail, onClick = null)
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
                 ProfileItemRow(icon = Icons.Default.Phone, title = "Mobile Number", subtitle = userPhone)
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
