@@ -271,7 +271,7 @@ fun ProfileItemRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Row(
