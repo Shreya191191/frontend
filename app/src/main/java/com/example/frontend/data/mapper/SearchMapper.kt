@@ -1,4 +1,4 @@
-package com.example.frontend.data.mapper
+ package com.example.frontend.data.mapper
 
 import com.example.frontend.data.remote.dto.VehicleDto
 import com.example.frontend.domain.model.Vehicle
