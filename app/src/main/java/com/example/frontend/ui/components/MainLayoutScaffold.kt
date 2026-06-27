@@ -191,25 +191,6 @@ fun MainLayoutScaffold(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                 )
 
-                Divider(modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp), color = SlateGrey.copy(alpha = 0.2f))
-
-                // Placeholder Items for completeness
-                NavigationDrawerItem(
-                    label = { Text("App Settings", color = SlateGrey) },
-                    selected = false,
-                    onClick = { /* Placeholder action */ },
-                    icon = { Icon(painter = painterResource(id = R.drawable.ic_profile), contentDescription = null, tint = SlateGrey) },
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                )
-
-                NavigationDrawerItem(
-                    label = { Text("Help & Support", color = SlateGrey) },
-                    selected = false,
-                    onClick = { /* Placeholder action */ },
-                    icon = { Icon(painter = painterResource(id = R.drawable.ic_search), contentDescription = null, tint = SlateGrey) },
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                )
-
                 Spacer(modifier = Modifier.weight(1f))
 
                 // Sign Out Button
@@ -265,15 +246,7 @@ fun MainLayoutScaffold(
                             )
                         }
                     },
-                    actions = {
-                        IconButton(onClick = { /* Premium Notification flow placeholder */ }) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    },
+
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surface,
                         titleContentColor = MaterialTheme.colorScheme.onSurface
