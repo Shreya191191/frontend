@@ -125,7 +125,7 @@ fun ProfileScreen(
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
                 ProfileItemRow(icon = Icons.Default.Phone, title = "Mobile Number", subtitle = userPhone, onClick = null)
                 Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Home, title = "Address", subtitle = userAddress)
+                ProfileItemRow(icon = Icons.Default.Home, title = "Address", subtitle = userAddress, onClick = null)
             }
         }
 
