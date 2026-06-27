@@ -1,7 +1,9 @@
 package com.example.frontend.ui.screens.profile
 
 import com.example.frontend.ui.components.bounceClick
+import com.example.frontend.ui.components.ComingSoonDialog
 import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,7 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.frontend.ui.navigation.Screen
 import com.example.frontend.ui.theme.EmeraldPrimary
+
 import com.example.frontend.ui.theme.SlateGrey
 import android.widget.Toast
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,10 +67,11 @@ fun ProfileScreen(
         }
     }
 
-    val userName = user?.username ?: "Guest User"
-    val userEmail = user?.email ?: "guest@rentaride.com"
-    val userPhone = user?.phoneNumber ?: "Not Added"
-    val userAddress = user?.adress ?: "Not Added"
+    val userName: String = user?.username?.takeIf { it.isNotBlank() } ?: "Guest User"
+    val userEmail: String = user?.email?.takeIf { it.isNotBlank() } ?: "guest@rentaride.com"
+    val userPhone: String = user?.phoneNumber?.takeIf { it.isNotBlank() } ?: "Not Added"
+    val userAddress: String = user?.adress?.takeIf { it.isNotBlank() } ?: "Not Added"
+
 
     Column(
         modifier = modifier
@@ -121,12 +126,12 @@ fun ProfileScreen(
                     subtitle = "Manage name, mobile & details",
                     onClick = { showEditDialog = true }
                 )
-                Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Email, title = "Email Address", subtitle = userEmail, onClick = null)
-                Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Phone, title = "Mobile Number", subtitle = userPhone, onClick = null)
-                Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Home, title = "Address", subtitle = userAddress, onClick = null)
+                HorizontalDivider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
+                ProfileItemRow(icon = Icons.Default.Email, title = "Email Address", subtitle = userEmail)
+                HorizontalDivider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
+                ProfileItemRow(icon = Icons.Default.Phone, title = "Mobile Number", subtitle = userPhone)
+                HorizontalDivider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
+                ProfileItemRow(icon = Icons.Default.Home, title = "Address", subtitle = userAddress)
             }
         }
 
@@ -140,15 +145,31 @@ fun ProfileScreen(
             border = BorderStroke(1.dp, SlateGrey.copy(alpha = 0.12f))
         ) {
             Column {
-                ProfileItemRow(icon = Icons.Default.Lock, title = "Change Password", subtitle = "Secure your login credentials", onClick = { showComingSoonDialog = true })
-                Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Lock, title = "Privacy & Safety", subtitle = "Account security configuration", onClick = { showComingSoonDialog = true })
-                Divider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
-                ProfileItemRow(icon = Icons.Default.Settings, title = "App Settings", subtitle = "Theme, units & notifications")
+                ProfileItemRow(
+                    icon = Icons.Default.Lock, 
+                    title = "Change Password", 
+                    subtitle = "Secure your login credentials",
+                    onClick = { showComingSoonDialog = true }
+                )
+                HorizontalDivider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
+                ProfileItemRow(
+                    icon = Icons.Default.Lock, 
+                    title = "Privacy & Safety", 
+                    subtitle = "Account security configuration",
+                    onClick = { showComingSoonDialog = true }
+                )
+                HorizontalDivider(color = SlateGrey.copy(alpha = 0.08f), modifier = Modifier.padding(horizontal = 16.dp))
+                ProfileItemRow(
+                    icon = Icons.Default.Settings, 
+                    title = "App Settings", 
+                    subtitle = "Theme, units & notifications",
+                    onClick = { navController.navigate(Screen.Settings.route) }
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+
 
         Button(
             onClick = onSignOut,
@@ -265,7 +286,12 @@ fun ProfileScreen(
             shape = RoundedCornerShape(20.dp)
         )
     }
+
+    if (showComingSoonDialog) {
+        ComingSoonDialog(onDismiss = { showComingSoonDialog = false })
+    }
 }
+
 
 @Composable
 fun ProfileItemRow(
@@ -275,16 +301,23 @@ fun ProfileItemRow(
     onClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val rowModifier = Modifier
+        .fillMaxWidth()
+        .let {
+            if (onClick != null) {
+                it.clickable(
+                    interactionSource = interactionSource,
+                    indication = androidx.compose.foundation.LocalIndication.current,
+                    onClick = onClick
+                ).bounceClick(interactionSource)
+            } else {
+                it
+            }
+        }
+        .padding(16.dp)
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                interactionSource = interactionSource,
-                indication = androidx.compose.foundation.LocalIndication.current,
-                onClick = onClick
-            )
-            .bounceClick(interactionSource)
-            .padding(16.dp),
+        modifier = rowModifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -304,6 +337,9 @@ fun ProfileItemRow(
             Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = SlateGrey)
         }
 
-        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, tint = SlateGrey)
+        if (onClick != null) {
+            Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, tint = SlateGrey)
+        }
     }
 }
+
