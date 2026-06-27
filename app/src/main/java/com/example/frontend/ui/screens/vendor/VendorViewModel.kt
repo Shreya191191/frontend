@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.frontend.domain.model.Vehicle
 import com.example.frontend.domain.model.VendorBooking
 import com.example.frontend.domain.repository.SearchRepository
+import com.example.frontend.domain.repository.VendorRepository
 import com.example.frontend.domain.usecase.*
 import com.example.frontend.ui.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ class VendorViewModel @Inject constructor(
     private val editVehicleUseCase: EditVehicleUseCase,
     private val deleteVehicleUseCase: DeleteVehicleUseCase,
     private val getVendorBookingsUseCase: GetVendorBookingsUseCase,
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    private val vendorRepository: VendorRepository
 ) : ViewModel() {
 
     // Current logged-in vendor user
@@ -47,6 +49,10 @@ class VendorViewModel @Inject constructor(
     // Delete Vehicle State
     private val _deleteState = MutableStateFlow<Resource<String>>(Resource.Success(""))
     val deleteState: StateFlow<Resource<String>> = _deleteState.asStateFlow()
+
+    // Change Booking Status State
+    private val _changeStatusState = MutableStateFlow<Resource<String>>(Resource.Success(""))
+    val changeStatusState: StateFlow<Resource<String>> = _changeStatusState.asStateFlow()
 
     // Metadata for Form Dropdowns
     private val _districts = MutableStateFlow<List<String>>(emptyList())
@@ -248,6 +254,25 @@ class VendorViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun changeBookingStatus(bookingId: String, status: String) {
+        viewModelScope.launch {
+            vendorRepository.changeBookingStatus(bookingId, status).collect { resource ->
+                _changeStatusState.value = resource
+                if (resource is Resource.Success) {
+                    _vehiclesState.value.let { vehiclesRes ->
+                        if (vehiclesRes is Resource.Success) {
+                            fetchBookings(vehiclesRes.data.map { it.id })
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetChangeStatusState() {
+        _changeStatusState.value = Resource.Success("")
     }
 
     fun resetStates() {
