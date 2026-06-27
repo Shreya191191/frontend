@@ -55,7 +55,6 @@ fun MainLayoutScaffold(
         BottomNavItem("Home", Screen.Home.route, R.drawable.ic_home),
         BottomNavItem("Search", Screen.Search.route, R.drawable.ic_search),
         BottomNavItem("Orders", Screen.Orders.route, R.drawable.ic_orders),
-        BottomNavItem("Wishlist", Screen.Wishlist.route, R.drawable.ic_wishlist),
         BottomNavItem("Profile", Screen.Profile.route, R.drawable.ic_profile)
     )
 
@@ -64,11 +63,11 @@ fun MainLayoutScaffold(
         Screen.Home.route -> "Dashboard"
         Screen.Search.route -> "Search Vehicles"
         Screen.Orders.route -> "My Bookings"
-        Screen.Wishlist.route -> "Favorites"
         Screen.Profile.route -> "My Profile"
         Screen.SearchResults.route -> "Search Results"
         else -> "Rent-a-Ride"
     }
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -138,7 +137,7 @@ fun MainLayoutScaffold(
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.Home.route) { saveState = true }
                                 launchSingleTop = true
-                                restoreState = true
+                                restoreState = false
                             }
                         }
                     },
