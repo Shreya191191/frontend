@@ -29,7 +29,7 @@ data class VehicleDto(
     val year_made: Int?,
     val fuel_type: String?,
     val rented_by: String?,
-    val rating: String?,
+    val rating: List<String>?,
     val seats: Int?,
     val transmition: String?,
     val image: List<String>?,
