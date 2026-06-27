@@ -8,17 +8,17 @@ import com.example.frontend.domain.model.BookingDetails
 fun BookingDto.toDomain(): Booking {
     return Booking(
         id = _id,
-        pickupDate = pickupDate,
-        dropOffDate = dropOffDate,
-        userId = userId,
-        pickUpLocation = pickUpLocation,
-        vehicleId = vehicleId,
-        dropOffLocation = dropOffLocation,
-        pickUpDistrict = pickUpDistrict,
-        totalPrice = totalPrice,
-        razorpayPaymentId = razorpayPaymentId,
-        razorpayOrderId = razorpayOrderId,
-        status = status,
+        pickupDate = pickupDate ?: "",
+        dropOffDate = dropOffDate ?: "",
+        userId = userId ?: "",
+        pickUpLocation = pickUpLocation ?: "",
+        vehicleId = vehicleId ?: "",
+        dropOffLocation = dropOffLocation ?: "",
+        pickUpDistrict = pickUpDistrict ?: "",
+        totalPrice = totalPrice ?: 0.0,
+        razorpayPaymentId = razorpayPaymentId ?: "",
+        razorpayOrderId = razorpayOrderId ?: "",
+        status = status ?: "",
         createdAt = createdAt
     )
 }
