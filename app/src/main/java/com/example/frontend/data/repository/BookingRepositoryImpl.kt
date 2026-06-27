@@ -137,7 +137,7 @@ class BookingRepositoryImpl @Inject constructor(
                     year_made = bookingDetails.vehicle.yearMade,
                     fuel_type = bookingDetails.vehicle.fuelType,
                     rented_by = bookingDetails.vehicle.rentedBy,
-                    rating = bookingDetails.vehicle.rating,
+                    rating = bookingDetails.vehicle.rating?.let { listOf(it) },
                     seats = bookingDetails.vehicle.seats,
                     transmition = bookingDetails.vehicle.transmission,
                     image = bookingDetails.vehicle.image,
