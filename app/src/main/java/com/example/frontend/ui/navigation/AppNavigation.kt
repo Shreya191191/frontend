@@ -30,6 +30,8 @@ import com.example.frontend.ui.screens.home.HomeScreen
 import com.example.frontend.ui.screens.orders.*
 import com.example.frontend.ui.screens.wishlist.WishlistScreen
 import com.example.frontend.ui.screens.profile.ProfileScreen
+import com.example.frontend.ui.screens.settings.SettingsScreen
+import com.example.frontend.ui.screens.settings.AboutScreen
 import com.example.frontend.ui.screens.booking.CheckoutScreen
 import com.example.frontend.ui.screens.booking.BookingSuccessScreen
 import com.example.frontend.ui.screens.vendor.VendorDashboardScreen
@@ -212,6 +214,14 @@ fun CustomerNavHost(
             WishlistScreen(
                 navController = navController
             )
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(navController = navController)
+        }
+
+        composable(Screen.About.route) {
+            AboutScreen(navController = navController)
         }
 
         composable(Screen.Profile.route) {
