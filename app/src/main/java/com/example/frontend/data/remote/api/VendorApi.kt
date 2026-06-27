@@ -53,4 +53,9 @@ interface VendorApi {
     suspend fun getVendorBookings(
         @Body request: VendorBookingsRequest
     ): Response<List<VendorBookingResponseItem>>
+
+    @POST("api/admin/changeStatus")
+    suspend fun changeBookingStatus(
+        @Body request: ChangeBookingStatusRequest
+    ): Response<BaseResponse<String>>
 }
