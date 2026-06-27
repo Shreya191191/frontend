@@ -292,7 +292,7 @@ fun MainLayoutScaffold(
                                         // reselecting the same item
                                         launchSingleTop = true
                                         // Restore state when reselecting a previously selected item
-                                        restoreState = true
+                                        restoreState = item.route != Screen.Home.route
                                     }
                                 }
                             },
