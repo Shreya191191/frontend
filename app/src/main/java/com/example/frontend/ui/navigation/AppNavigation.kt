@@ -28,7 +28,6 @@ import com.example.frontend.ui.screens.auth.*
 import com.example.frontend.ui.screens.search.*
 import com.example.frontend.ui.screens.home.HomeScreen
 import com.example.frontend.ui.screens.orders.*
-import com.example.frontend.ui.screens.wishlist.WishlistScreen
 import com.example.frontend.ui.screens.profile.ProfileScreen
 import com.example.frontend.ui.screens.settings.SettingsScreen
 import com.example.frontend.ui.screens.settings.AboutScreen
@@ -36,6 +35,8 @@ import com.example.frontend.ui.screens.booking.CheckoutScreen
 import com.example.frontend.ui.screens.booking.BookingSuccessScreen
 import com.example.frontend.ui.screens.vendor.VendorDashboardScreen
 import com.example.frontend.ui.screens.admin.AdminDashboardScreen
+import com.example.frontend.ui.screens.settings.*
+
 
 @Composable
 fun AppNavigation(
@@ -54,12 +55,12 @@ fun AppNavigation(
         Screen.Home.route,
         Screen.Search.route,
         Screen.Orders.route,
-        Screen.Wishlist.route,
         Screen.Profile.route,
         Screen.SearchResults.route,
         Screen.VehicleVariants.route,
         Screen.VehicleDetails.route
     )
+
 
     val startDestination = if (currentSession != null) {
         when {
@@ -210,9 +211,16 @@ fun CustomerNavHost(
             )
         }
 
-        composable(Screen.Wishlist.route) {
-            WishlistScreen(
-                navController = navController
+        composable(Screen.Profile.route) {
+
+            ProfileScreen(
+                navController = navController,
+                onSignOut = {
+                    authViewModel.signOut()
+                    navController.navigate(Screen.SignIn.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
 
@@ -224,17 +232,6 @@ fun CustomerNavHost(
             AboutScreen(navController = navController)
         }
 
-        composable(Screen.Profile.route) {
-            ProfileScreen(
-                navController = navController,
-                onSignOut = {
-                    authViewModel.signOut()
-                    navController.navigate(Screen.SignIn.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            )
-        }
 
         composable(Screen.SearchResults.route) {
             SearchResultsScreen(
