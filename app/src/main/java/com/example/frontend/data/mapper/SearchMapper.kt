@@ -15,7 +15,10 @@ fun VehicleDto.toDomain(): Vehicle {
         yearMade = year_made,
         fuelType = fuel_type,
         rentedBy = rented_by,
-        rating = rating,
+        rating = rating?.let { list ->
+            val valid = list.mapNotNull { it.trim().toFloatOrNull() }
+            if (valid.isEmpty()) null else valid.average().toString()
+        },
         seats = seats,
         transmission = transmition,
         image = image ?: emptyList(),
